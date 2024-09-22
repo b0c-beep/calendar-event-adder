@@ -49,7 +49,7 @@ const AuthScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Auth Screen</Text>
+            <Text style={styles.text}>Authentication</Text>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TextInput 
                 style={styles.input} 

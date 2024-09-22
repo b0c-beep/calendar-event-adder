@@ -21,7 +21,7 @@ const ProfileScreen = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Profile Screen</Text>
+            <Text style={styles.text}>Profile</Text>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity onPress={handleSignOut} style={styles.button}>
                 <Text>Sign Out</Text>
