@@ -57,9 +57,8 @@ const ProfileScreen = ({navigation}) => {
           quality: 1,
         });
       
-        if (!result.cancelled) {
-          const formData = new FormData();
-          formData.append('image', {
+        const formData = new FormData();
+        formData.append('image', {
             uri: result.uri,
             name: 'image.jpg',
             type: 'image/jpeg',
@@ -81,13 +80,12 @@ const ProfileScreen = ({navigation}) => {
                 //Alert.alert('Error', data.error);
                 setError(data.error);
             }
-            } catch (error) {
+        } catch (error) {
                 console.error(error);
                 //Alert.alert('Error', 'An error occurred while classifying the image.');
                 setError(error.message);
-            }
         }
-      };
+    }
 
     return (
         <View style={styles.container}>

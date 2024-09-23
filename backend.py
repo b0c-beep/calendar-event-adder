@@ -9,8 +9,10 @@ app = Flask(__name__)
 
 # Set your Hugging Face model API URL and API token
 API_URL = "https://api-inference.huggingface.co/models/b0c-beep/ft-plant-identifier"  # Replace with your model path
-#API_TOKEN = os.getenv("REACT_APP_HUGGING_FACE_API_TOKEN")
-API_TOKEN = "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"
+API_TOKEN = os.getenv("REACT_APP_HUGGINGFACE_API_TOKEN")
+
+if not API_TOKEN:
+    raise ValueError("Hugging Face API token not found in environment variables.")
 
 LABEL_MAP = {
     0: "Aloe vera",
