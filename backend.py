@@ -9,7 +9,8 @@ app = Flask(__name__)
 
 # Set your Hugging Face model API URL and API token
 API_URL = "https://api-inference.huggingface.co/models/b0c-beep/ft-plant-identifier"  # Replace with your model path
-API_TOKEN = os.getenv("REACT_APP_HUGGING_FACE_API_TOKEN")
+#API_TOKEN = os.getenv("REACT_APP_HUGGING_FACE_API_TOKEN")
+API_TOKEN = "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"
 
 LABEL_MAP = {
     0: "Aloe vera",
@@ -84,5 +85,10 @@ def classify():
     else:
         return jsonify({'error': confidence}), 500
 
+
+@app.route('/test', methods=['GET'])
+def test():
+    return jsonify(message="Server is reachable!"), 200
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

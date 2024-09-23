@@ -10,6 +10,7 @@ const ProfileScreen = ({navigation}) => {
     const [error, setError] = useState('');
     const [result, setResult] = useState(false);
     const [prediction, setPrediction] = useState('');
+    const [test, setTest] = useState('');
 
     const handleSignOut = async () => {
         try{
@@ -21,6 +22,24 @@ const ProfileScreen = ({navigation}) => {
             setError(err.message);
         }
     };
+
+
+    const checkServer = async () => {
+        try {
+            const response = await fetch('http://192.168.1.139:5000/test'); // Replace with your IP
+            const data = await response.json();
+
+            if (response.ok) {
+                setTest(data.message);
+            } else {
+                setTest('Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            //Alert.alert('Error', 'Failed to reach the server');
+        }
+    };
+
 
     const classifyImage = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -75,6 +94,7 @@ const ProfileScreen = ({navigation}) => {
             <Text style={styles.text}>Profile</Text>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             {result ? <Text style={styles.text}>{prediction}</Text> : null}
+            {test ? <Text style={styles.text}>{test}</Text> : null}
             <TouchableOpacity onPress={handleSignOut} style={styles.button}>
                 <Text>Sign Out</Text>
             </TouchableOpacity>
