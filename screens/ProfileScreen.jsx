@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 const ProfileScreen = ({navigation}) => {
     const [user, setUser] = useState(null);
@@ -11,6 +12,14 @@ const ProfileScreen = ({navigation}) => {
     const [result, setResult] = useState(false);
     const [prediction, setPrediction] = useState('');
     const [test, setTest] = useState('');
+    const [image, setImage] = useState(null);
+
+    const convertToBase64 = async (uri) => {
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        return base64;
+    };
 
     const handleSignOut = async () => {
         try{
@@ -49,41 +58,38 @@ const ProfileScreen = ({navigation}) => {
             return;
         }
 
-        // Launch image picker
-        const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-      
-        const formData = new FormData();
-        formData.append('image', {
-            uri: result.uri,
-            name: 'image.jpg',
-            type: 'image/jpeg',
-        });
-      
         try {
-            const response = await fetch('http://192.168.1.139:5000/classify', {
-              method: 'POST',
-              body: formData,
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
             });
-      
-            const data = await response.json();
-            setError('sent');
-            if (response.ok) {
-                //Alert.alert(`Predicted Plant: ${data.plant_name}, Confidence: ${data.confidence}`);
-                setResult(true);
-                setPrediction(`Predicted Plant: ${data.plant_name}`);
-            } else {
-                //Alert.alert('Error', data.error);
-                setError(data.error);
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                setImage(result.assets[0].uri);
+                const base64Image = await convertToBase64(result.assets[0].uri);
+                
+                const response = await fetch('http://192.168.0.109:5000/classify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image: base64Image }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    setResult(true);
+                    setPrediction(`Predicted Plant: ${data.plant_name}`);
+                } else {
+                    setError(data.error || 'An error occurred while classifying the image.');
+                }
             }
         } catch (error) {
-                console.error(error);
-                //Alert.alert('Error', 'An error occurred while classifying the image.');
-                setError(error.message);
+            console.error(error);
+            setError('An error occurred while processing the image.');
         }
     }
 
@@ -93,6 +99,7 @@ const ProfileScreen = ({navigation}) => {
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             {result ? <Text style={styles.text}>{prediction}</Text> : null}
             {test ? <Text style={styles.text}>{test}</Text> : null}
+            {image ? <Image source={{ uri: image }} style={{ width: 200, height: 200 }} /> : null}
             <TouchableOpacity onPress={handleSignOut} style={styles.button}>
                 <Text>Sign Out</Text>
             </TouchableOpacity>

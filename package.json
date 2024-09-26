@@ -15,6 +15,7 @@
     "@react-navigation/native-stack": "^6.11.0",
     "dotenv": "^16.4.5",
     "expo": "^51.0.32",
+    "expo-file-system": "^17.0.1",
     "expo-image-picker": "^15.0.7",
     "expo-status-bar": "~1.12.1",
     "firebase": "^10.13.2",

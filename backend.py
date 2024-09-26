@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
+from PIL import Image
 import os
 import requests
 import base64
+import io
 
 load_dotenv()
 app = Flask(__name__)
@@ -48,44 +50,52 @@ LABEL_MAP = {
 }
 
 # Function to classify an image using the Hugging Face API
-def classify_image(encoded_image):
+def classify_image(image):
+    # Convert PIL Image to bytes
+    img_byte_arr = io.BytesIO()
+    image.save(img_byte_arr, format='PNG')
+    img_byte_arr = img_byte_arr.getvalue()
+    
+    # Encode image to base64
+    encoded_image = base64.b64encode(img_byte_arr).decode('utf-8')
+    
     payload = {"inputs": encoded_image}
-    headers = {"Authorization": f"Bearer {API_TOKEN}", "Content-Type": "application/json"}
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
     
     response = requests.post(API_URL, headers=headers, json=payload)
 
     if response.status_code == 200:
         predictions = response.json()
-        
-        # Extract the label from the first prediction (highest score)
-        predicted_label = predictions[0]['label']  # e.g., 'LABEL_17'
-        
-        # Extract the numeric part from the label
-        predicted_class = int(predicted_label.split('_')[1])  # Get the numeric part
-        
-        # Get the corresponding plant name
+        predicted_label = predictions[0]['label']
+        predicted_class = int(predicted_label.split('_')[1])
         plant_name = LABEL_MAP[predicted_class]
-        
         return plant_name, predictions[0]['score']
     else:
         return None, response.text
 
 @app.route('/classify', methods=['POST'])
 def classify():
-    print("Request received")
-    if 'image' not in request.files:
+    if 'image' not in request.json:
         return jsonify({'error': 'No image provided'}), 400
     
-    image_file = request.files['image']
-    image_bytes = image_file.read()
-    encoded_image = base64.b64encode(image_bytes).decode('utf-8')
-
-    plant_name, confidence = classify_image(encoded_image)
+    base64_image = request.json['image']
     
-    if plant_name:
+    try:
+        # Decode base64 string to image
+        image_data = base64.b64decode(base64_image)
+        image = Image.open(io.BytesIO(image_data))
+        
+        plant_name, confidence = classify_image(image)
+        
         return jsonify({'plant_name': plant_name, 'confidence': confidence}), 200
-    else:
-        return jsonify({'error': confidence}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+
+# Helper function to check allowed file types
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/test', methods=['GET'])
