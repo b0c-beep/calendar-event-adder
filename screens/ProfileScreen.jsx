@@ -51,6 +51,8 @@ const ProfileScreen = ({navigation}) => {
 
 
     const classifyImage = async () => {
+        setResult(false);
+        setPrediction('');
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (permissionResult.granted === false) {

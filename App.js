@@ -10,8 +10,8 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Auth">
+    <NavigationContainer style={styles.container}>
+      <Stack.Navigator initialRouteName="Auth" screenOptions={{headerShown: false}}>
         <Stack.Screen name="Auth" component={AuthScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>

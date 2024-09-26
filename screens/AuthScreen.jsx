@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-nativ
 import { auth } from '../firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { FontAwesome } from '@expo/vector-icons';
 
 const AuthScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -49,59 +50,92 @@ const AuthScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Authentication</Text>
+            <View style={styles.title_container}>
+                <View style={styles.title_wrapper}>
+                    <FontAwesome name="leaf" size={70} color="green" style={styles.logo}/>
+                    <Text style={styles.title}>Plant Identifier</Text>
+                </View>
+            </View>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
-            <TextInput 
-                style={styles.input} 
-                placeholder="Email" 
-                value={email} 
-                onChangeText={setEmail}
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder="Password" 
-                value={password} 
-                onChangeText={setPassword}
-                secureTextEntry 
-            />
-            <TouchableOpacity 
-                style={styles.button} 
-                onPress={handleLogin} 
-            >
-                <Text>Login</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={handleRegister} 
-                style={styles.button}
-            >
-                <Text>Register</Text>
-            </TouchableOpacity>
+            <View style={styles.input_container}>
+                <TextInput 
+                    style={styles.input} 
+                    placeholder="Email" 
+                    value={email} 
+                    onChangeText={setEmail}
+                />
+                <TextInput 
+                    style={styles.input} 
+                    placeholder="Password" 
+                    value={password} 
+                    onChangeText={setPassword}
+                    secureTextEntry 
+                />
+                <TouchableOpacity 
+                    style={styles.button} 
+                    onPress={handleLogin} 
+                >
+                    <Text>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleRegister} 
+                    style={styles.button}
+                >
+                    <Text>Register</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        height: '100%',
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#9bd3b4',
+    },
+    title_container: {
+        alignItems: 'center',
+        marginTop: 60,
+    },
+    title_wrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 55,
+    },
+    input_container: {
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 180,
+    },
+    title: {
+        fontSize: 38,
+        color: '#000',
+        margin: 60,
+        fontFamily: 'Cochin',
+        marginLeft: 10,
+    }, 
+    logo: {
+        margin: 0,
     },
     text: {
         fontSize: 20,
         color: '#000',
     },
     input: {
+        color: '#000',
         width: '80%', // Make the input wider
         padding: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#000',
         borderRadius: 5,
         marginVertical: 10,
     },
     button: {
         padding: 10,
-        backgroundColor: 'lightblue',
+        backgroundColor: '#77bc96',
         borderRadius: 5,
         margin: 10,
         width: '80%', // Make the button wider
