@@ -97,17 +97,19 @@ const ProfileScreen = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Profile</Text>
+            <Text style={styles.text}>Pick a plant image to classify</Text>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
-            {result ? <Text style={styles.text}>{prediction}</Text> : null}
+            {result ? <Text style={styles.prediction}>{prediction}</Text> : null}
             {test ? <Text style={styles.text}>{test}</Text> : null}
-            {image ? <Image source={{ uri: image }} style={{ width: 200, height: 200 }} /> : null}
-            <TouchableOpacity onPress={handleSignOut} style={styles.button}>
-                <Text>Sign Out</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={classifyImage}>
-                <Text style={styles.buttonText}>Pick an Image</Text>
-            </TouchableOpacity>
+            {image ? <Image source={{ uri: image }} style={styles.image} /> : null}
+            <View style={styles.button_container}>
+                <TouchableOpacity onPress={handleSignOut} style={styles.button}>
+                    <Text>Sign Out</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={classifyImage}>
+                    <Text style={styles.buttonText}>Pick an Image</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -117,16 +119,34 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#9bd3b4',
+    },
+    button_container: {
+        flexDirection: 'row',
+    },
+    image: {
+        width: 200,
+        height: 200,
+        marginBottom: 20,
+        marginTop: 10,
+        borderRadius: 10,
     },
     text: {
         fontSize: 20,
         color: '#000',
     },
+    prediction: {
+        fontSize: 20,
+        color: '#000',
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginBottom: 10,
+    },
     button: {
-        backgroundColor: '#DDDDDD',
+        backgroundColor: '#77bc96',
         padding: 10,
         margin: 10,
+        borderRadius: 5,
     },
     errorText: {
         color: 'red',
