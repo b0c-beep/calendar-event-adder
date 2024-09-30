@@ -1,4 +1,4 @@
-The model has been trained to recognize this plants:
+The model has been trained to recognize these plants:
 aloevera
 banana
 bilimbi
