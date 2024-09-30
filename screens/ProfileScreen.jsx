@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { auth } from '../firebase';
+import { auth, firestore } from '../firebase';
 import { signOut } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import { addDoc, collection } from 'firebase/firestore';
+import HistoryModal from '../components/HistoryModal';
 
 const ProfileScreen = ({navigation}) => {
     const [user, setUser] = useState(null);
@@ -13,6 +15,7 @@ const ProfileScreen = ({navigation}) => {
     const [prediction, setPrediction] = useState('');
     const [test, setTest] = useState('');
     const [image, setImage] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
     const convertToBase64 = async (uri) => {
         const base64 = await FileSystem.readAsStringAsync(uri, {
@@ -50,6 +53,34 @@ const ProfileScreen = ({navigation}) => {
     };
 
 
+    //function to save classification data to each user using firestore
+    const saveClassification = async (plantName, imageUri) => {
+        try{
+
+            const user = auth.currentUser;
+            if (!user){
+                setError('User not authenticated or found');
+                return;
+            }
+
+            const userRef = collection(firestore, 'users', user.uid, 'classifications');
+
+            //create new document with the classification details
+            await addDoc(userRef, {
+                plant_name: plantName,
+                image: imageUri,
+                timestamp: new Date(),
+            });
+
+            console.log('Classification saved successfully');
+
+        } catch (err) {
+            console.error(err);
+            setError(err.message);
+        }
+    }
+
+
     const classifyImage = async () => {
         setResult(false);
         setPrediction('');
@@ -72,7 +103,7 @@ const ProfileScreen = ({navigation}) => {
                 setImage(result.assets[0].uri);
                 const base64Image = await convertToBase64(result.assets[0].uri);
                 
-                const response = await fetch('http://192.168.0.109:5000/classify', {
+                const response = await fetch('http://192.168.0.103:5000/classify', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -85,6 +116,7 @@ const ProfileScreen = ({navigation}) => {
                 if (response.ok) {
                     setResult(true);
                     setPrediction(`Predicted Plant: ${data.plant_name}`);
+                    await saveClassification(data.plant_name, result.assets[0].uri);
                 } else {
                     setError(data.error || 'An error occurred while classifying the image.');
                 }
@@ -110,6 +142,12 @@ const ProfileScreen = ({navigation}) => {
                     <Text style={styles.buttonText}>Pick an Image</Text>
                 </TouchableOpacity>
             </View>
+            <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.button}>
+                <Text>Show History</Text>
+            </TouchableOpacity>
+
+            <HistoryModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+
         </View>
     );
 };
