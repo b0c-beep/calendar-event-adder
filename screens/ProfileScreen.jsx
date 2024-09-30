@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { addDoc, collection } from 'firebase/firestore';
 import HistoryModal from '../components/HistoryModal';
+import LottieView from 'lottie-react-native';
 
 const ProfileScreen = ({navigation}) => {
     const [user, setUser] = useState(null);
@@ -16,6 +17,7 @@ const ProfileScreen = ({navigation}) => {
     const [test, setTest] = useState('');
     const [image, setImage] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [sentRequest, setSentRequest] = useState(false);
 
     const convertToBase64 = async (uri) => {
         const base64 = await FileSystem.readAsStringAsync(uri, {
@@ -103,6 +105,7 @@ const ProfileScreen = ({navigation}) => {
                 setImage(result.assets[0].uri);
                 const base64Image = await convertToBase64(result.assets[0].uri);
                 
+                setSentRequest(true);
                 const response = await fetch('http://192.168.0.103:5000/classify', {
                     method: 'POST',
                     headers: {
@@ -114,6 +117,7 @@ const ProfileScreen = ({navigation}) => {
                 const data = await response.json();
 
                 if (response.ok) {
+                    setSentRequest(false);
                     setResult(true);
                     setPrediction(`Predicted Plant: ${data.plant_name}`);
                     await saveClassification(data.plant_name, result.assets[0].uri);
@@ -133,7 +137,14 @@ const ProfileScreen = ({navigation}) => {
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             {result ? <Text style={styles.prediction}>{prediction}</Text> : null}
             {test ? <Text style={styles.text}>{test}</Text> : null}
+            {sentRequest ? <LottieView
+                source={require('../assets/loading.json')}
+                autoPlay
+                loop
+                style={{ width: 50, height: 50 }}
+            /> : null}
             {image ? <Image source={{ uri: image }} style={styles.image} /> : null}
+            
             <View style={styles.button_container}>
                 <TouchableOpacity onPress={handleSignOut} style={styles.button}>
                     <Text>Sign Out</Text>
