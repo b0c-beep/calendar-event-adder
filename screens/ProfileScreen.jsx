@@ -7,7 +7,8 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { addDoc, collection } from 'firebase/firestore';
 import HistoryModal from '../components/HistoryModal';
-import LottieView from 'lottie-react-native';
+//import LottieView from 'lottie-react-native';
+import { REACT_APP_LOCAL_URL } from '@env';
 
 const ProfileScreen = ({navigation}) => {
     const [user, setUser] = useState(null);
@@ -40,7 +41,7 @@ const ProfileScreen = ({navigation}) => {
 
     const checkServer = async () => {
         try {
-            const response = await fetch('http://192.168.1.139:5000/test'); // Replace with your IP
+            const response = await fetch(REACT_APP_LOCAL_URL + '/test'); // Replace with your IP
             const data = await response.json();
 
             if (response.ok) {
@@ -106,7 +107,7 @@ const ProfileScreen = ({navigation}) => {
                 const base64Image = await convertToBase64(result.assets[0].uri);
                 
                 setSentRequest(true);
-                const response = await fetch('http://192.168.0.103:5000/classify', {
+                const response = await fetch((REACT_APP_LOCAL_URL + '/classify'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -137,12 +138,14 @@ const ProfileScreen = ({navigation}) => {
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             {result ? <Text style={styles.prediction}>{prediction}</Text> : null}
             {test ? <Text style={styles.text}>{test}</Text> : null}
+            {/*}
             {sentRequest ? <LottieView
                 source={require('../assets/loading.json')}
                 autoPlay
                 loop
                 style={{ width: 50, height: 50 }}
             /> : null}
+            */}
             {image ? <Image source={{ uri: image }} style={styles.image} /> : null}
             
             <View style={styles.button_container}>
