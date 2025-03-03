@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { addDoc, collection } from 'firebase/firestore';
 import HistoryModal from '../components/HistoryModal';
-//import LottieView from 'lottie-react-native';
+import LottieView from 'lottie-react-native';
 import { REACT_APP_LOCAL_URL } from '@env';
 
 const ProfileScreen = ({navigation}) => {
@@ -138,14 +138,14 @@ const ProfileScreen = ({navigation}) => {
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             {result ? <Text style={styles.prediction}>{prediction}</Text> : null}
             {test ? <Text style={styles.text}>{test}</Text> : null}
-            {/*}
+            
             {sentRequest ? <LottieView
                 source={require('../assets/loading.json')}
                 autoPlay
                 loop
                 style={{ width: 50, height: 50 }}
             /> : null}
-            */}
+        
             {image ? <Image source={{ uri: image }} style={styles.image} /> : null}
             
             <View style={styles.button_container}>
